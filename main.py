@@ -10,13 +10,16 @@ def letter_positions(secret_word, guess):
         counter += 1
     return positions
 
+
 def load_word_from_file():
-    with open("slownik.txt", "r") as file:
-        lines = file.readlines()
-    word = random.choice(lines)
+    try:
+        with open("words.txt", "r") as file:
+            lines = file.readlines()
+        word = random.choice(lines)
+    except FileNotFoundError:
+        print("File words.txt wasn't found")
+        word ="Create words.txt with words to draw"
     return word
-
-
 
 
 def word_encryption(word):
@@ -37,13 +40,21 @@ def menu(attempts=3):
         word = input("Enter a word :")
     elif guess == "2":
         word = load_word_from_file()
+    else:
+        print("You don't choice any of options, try again")
+        # continue
     secret_word = word_encryption(word.lstrip().rstrip())
-    for i in range(0, attempts):
+    while attempts>0:
         print(''.join(secret_word))
-        guess = input("Guess a letter :").lstrip()
+        guess = input("Guess a letter :").lstrip().rstrip()
+        if len(guess) != 1:
+            print("You can only guess one letter")
+            attempts -= 1
+            continue
         positions = letter_positions(word, guess)
         if len(positions) == 0:
             attempts -= 1
+            print("You miss {} attemps left".format(attempts))
         for letter_position in positions:
             secret_word[letter_position] = guess
         if secret_word.count("_") == 0:
@@ -53,4 +64,4 @@ def menu(attempts=3):
 
 
 if __name__ == "__main__":
-    menu(20)
+    menu(10)
